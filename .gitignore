@@ -1,0 +1,7 @@
+logs
+documentFolders
+node_modules
+tempFiles
+logs/*
+uploads
+node_module
