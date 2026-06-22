@@ -39,24 +39,24 @@ app.use('/api/partner',require('./Partner/partnerRoute.js'))
 app.use('/api/secondaryPartner',require('./secondaryPartner/secondaryPartnerRoute.js'))
 app.use('/api/vendor',require('./vendor/vendorRoute.js'))
 app.use('/api/client',require('./client/clientRoute.js'))
-app.use('/api/uploadedDoc',require('./clientUploadedDocs/uploadedDocRoute.js'))
+// app.use('/api/uploadedDoc',require('./clientUploadedDocs/uploadedDocRoute.js'))
 app.use('/api/dashboard',require('./dashboard/dashboardRoute.js'))
-app.use('/api/cron',require('./cron/cronRoute.js'))
-app.use('/api/spsn',require('./spsnUser/spsnUserRoute.js'))
-app.use('/api/processController',require('./botProcessController/processControllerRoute.js'))
-app.use('/api/fileProcessController',require('./fileProcessController/processControllerRoute.js'))
-app.use('/api/report',require('./report/reportRoute.js'))
-app.use('/api/vendorUploadedDoc',require('./vendorClientUploadedDocs/vendorUploadedDocRoute.js'))
-app.use('/api/vendorProcessController',require('./vendorBotProcessController/vendorProcessControllerRoute.js'))
-app.use('/api/vendorFileProcessController',require('./vendorFileProcessController/vendorProcessControllerRoute.js'))
-app.use('/api/spsnFileProcessController',require('./spsnFileProcessController/spsnProcessControllerRoute.js'))
-app.use('/api/jsonProcess',require('./jsonProcess/jsonProcessRoute.js'))
-app.use('/api/documentCleanup',require('./documentCleanup/documentCleanupRoute.js'))
-app.use('/api/extendedUser',require('./spsnExtendedUser/extendedUserRoute.js'))
+// app.use('/api/cron',require('./cron/cronRoute.js'))
+// app.use('/api/spsn',require('./spsnUser/spsnUserRoute.js'))
+// app.use('/api/processController',require('./botProcessController/processControllerRoute.js'))
+// app.use('/api/fileProcessController',require('./fileProcessController/processControllerRoute.js'))
+// app.use('/api/report',require('./report/reportRoute.js'))
+// app.use('/api/vendorUploadedDoc',require('./vendorClientUploadedDocs/vendorUploadedDocRoute.js'))
+// app.use('/api/vendorProcessController',require('./vendorBotProcessController/vendorProcessControllerRoute.js'))
+// app.use('/api/vendorFileProcessController',require('./vendorFileProcessController/vendorProcessControllerRoute.js'))
+// app.use('/api/spsnFileProcessController',require('./spsnFileProcessController/spsnProcessControllerRoute.js'))
+// app.use('/api/jsonProcess',require('./jsonProcess/jsonProcessRoute.js'))
+// app.use('/api/documentCleanup',require('./documentCleanup/documentCleanupRoute.js'))
+// app.use('/api/extendedUser',require('./spsnExtendedUser/extendedUserRoute.js'))
 
-app.use('/api/manualBlocker',require('./manualRunApiBlocker/manualBlockerRoute.js'))
+// app.use('/api/manualBlocker',require('./manualRunApiBlocker/manualBlockerRoute.js'))
 
-app.use('/api/ptDownload',require('./PtFileMergeDownloads/ptDownloadRoute.js'))
+// app.use('/api/ptDownload',require('./PtFileMergeDownloads/ptDownloadRoute.js'))
 
 // app.use('/api/utils',require('./AdditionalUtils/additionalutisRoute.js'))
 app.use('/api/',(req,res,next) =>
@@ -69,24 +69,60 @@ app.use('/api/',(req,res,next) =>
     }) 
 })
 
+// Dummy GET API
+app.get('/api/test', (req, res) => {
+    return res.status(200).json({
+        status_code: 200,
+        message: "Dummy GET API working",
+        status_name: getCode.getStatus(200),
+        data: {
+            id: 1,
+            name: "Test User",
+            environment: "Development"
+        }
+    });
+});
+
+// Dummy POST API
+app.post('/api/test', (req, res) => {
+    return res.status(201).json({
+        status_code: 201,
+        message: "Dummy POST API working",
+        status_name: getCode.getStatus(201),
+        body: req.body
+    });
+});
+
+// Dummy Delay API (for loader testing)
+app.get('/api/test-delay', async (req, res) => {
+    setTimeout(() => {
+        res.status(200).json({
+            status_code: 200,
+            message: "Response after 5 seconds"
+        });
+    }, 5000);
+});
+
+// Dummy Error API
+app.get('/api/test-error', (req, res) => {
+    return res.status(500).json({
+        status_code: 500,
+        message: "Dummy server error",
+        status_name: getCode.getStatus(500)
+    });
+});
+
+// Keep this LAST
+app.use('/api/', (req, res, next) => {
+    return res.status(400).json({
+        status_code: 400,
+        message: "Something went wrong",
+        status_name: getCode.getStatus(400),
+        error: "Wrong method or api"
+    });
+});
+
 app.listen(port, () => 
 {
-    console.log(`InfoAugust Server is running on port ${port}`);
-    // sftpCheck()
-    
-    // mail reports
-    let mailReport = require('./report/mainThread.js')
-    mailReport()
-
-    let spsnLedgerDownload = require('./spsnLedgerDownloadThread/mainThread.js')
-    spsnLedgerDownload()
-
-    
-    let ptDownload = require('./PtFileMergeDownloads/mainThread.js')
-    ptDownload()
-
-    
-
-    let documentCleanupThread = require('./documentCleanupThread/mainThread.js')
-    documentCleanupThread()
+    console.log(`InfoAugust Server is running on port ${port}`)
 });
