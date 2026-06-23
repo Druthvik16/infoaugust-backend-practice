@@ -15,7 +15,6 @@ PM2_NAME="infoAugustServer"
 
 # Change port if required
 HEALTH_URL="http://localhost:3001/health"
-LOG_FILE="/tmp/deployment-error.log"
 SNS_TOPIC_ARN="arn:aws:sns:ap-south-1:123456789012:backend-deployment-notifications"
 
 send_failure_notification() {

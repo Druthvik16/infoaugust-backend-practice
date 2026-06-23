@@ -5,7 +5,7 @@ let dotenv = require('dotenv');
 let errorCodes = require('./common/error/errorCode.js');
 let getCode = new errorCodes()
 let port = "3001";
-let app = express(
+let app = express();
 let path = require('path');
 app.use(cors());
 app.use(bodyParser.json({limit: '100mb'}));
@@ -22,6 +22,13 @@ app.get('/health', (req, res) => {
     console.log("health api called")
 });
 
+app.get('/test-runtime-dependency', (req, res) => {
+
+    const lodash = require('lodash');
+
+    res.send('success');
+
+});
 
 //For Logo 
 app.use('/api/logo', (req,res,next) =>
