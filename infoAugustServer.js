@@ -22,7 +22,7 @@ app.get('/health', (req, res) => {
     console.log("health api called")
 });
 
-app.get('/api/test', (req, res) => {
+app.get('/api/test/new', (req, res) => {
     return res.status(200).json({
         status_code: 200,
         message: "Dummy GET API working",

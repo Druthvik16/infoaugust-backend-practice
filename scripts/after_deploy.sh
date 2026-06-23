@@ -12,6 +12,8 @@ set -x
 
 APP_DIR="/home/ubuntu/node-application-docbase/info-august-dev"
 PM2_NAME="infoAugustServer"
+
+# Change port if required
 HEALTH_URL="http://localhost:3000/health"
 
 # ===================================================================
@@ -45,9 +47,9 @@ if [ "$NEW_HASH" != "$OLD_HASH" ]; then
 
     echo "=================================="
     echo "Dependency changes detected!"
-    echo "Running npm ci..."
+    echo "Running npm install..."
     echo "=================================="
-    #rm -rf node_modules
+
     sudo npm install --legacy-peer-deps
 
     # Save new hash
@@ -57,7 +59,7 @@ else
 
     echo "=================================="
     echo "No dependency changes detected."
-    echo "Skipping npm ci."
+    echo "Skipping npm install."
     echo "=================================="
 
 fi
@@ -69,7 +71,7 @@ echo "=================================="
 sudo pm2 restart "$PM2_NAME"
 
 echo "=================================="
-echo "Deployment of $PM2_NAME completed successfully"
+echo "Waiting for application startup..."
 echo "=================================="
 
 sleep 15
@@ -83,7 +85,7 @@ PM2_STATUS=$(pm2 describe "$PM2_NAME" | grep "status" | head -1)
 echo "$PM2_STATUS"
 
 if echo "$PM2_STATUS" | grep -qi "online"; then
-   
+
     echo "PM2 Process is ONLINE"
 
 else
@@ -101,14 +103,14 @@ else
 
 fi
 
-    echo "=================================="
-    echo "Running Health Check"
-    echo "=================================="
+echo "=================================="
+echo "Running Health Check"
+echo "=================================="
 
 if curl -f -s "$HEALTH_URL" > /dev/null; then
 
-     echo "Health Check Passed"
-    
+    echo "Health Check Passed"
+
 else
 
     echo "=================================="
@@ -124,12 +126,12 @@ else
 
 fi
 
-    echo "=================================="
-    echo "Recent PM2 Logs"
-    echo "=================================="
+echo "=================================="
+echo "Recent PM2 Logs"
+echo "=================================="
 
-    pm2 logs "$PM2_NAME" --lines 30 --nostream || true
+pm2 logs "$PM2_NAME" --lines 30 --nostream || true
 
-    echo "=================================="
-    echo "Deployment of $PM2_NAME completed successfully"
-    echo "=================================="
+echo "=================================="
+echo "Deployment of $PM2_NAME completed successfully"
+echo "=================================="
