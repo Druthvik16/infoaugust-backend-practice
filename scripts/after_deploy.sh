@@ -17,6 +17,10 @@ SNS_TOPIC_ARN="arn:aws:sns:ap-south-1:909317186074:backend-deployment-notificati
 S3_BUCKET="deployment-log-storage"
 REGION="ap-south-1"
 
+PYTHON_DIR="$APP_DIR/scripts/python"
+VENV_DIR="$PYTHON_DIR/venv"
+REQUIREMENTS_FILE="$PYTHON_DIR/requirements.txt"
+
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 
 finalize() {
@@ -37,7 +41,7 @@ finalize() {
         pm2 describe "$PM2_NAME" || true
         echo ""
         echo "========= LAST 100 PM2 LOGS ========="
-        pm2 logs "$PM2_NAME" --lines 50 --nostream || true
+        pm2 logs "$PM2_NAME" --lines 70 --nostream || true
     } > "$LOG_FILE" 2>&1
 
     echo ""
@@ -72,6 +76,43 @@ ${PRESIGNED_URL}
 }
 
 
+setup_python_env() {
+    echo "=================================="
+    echo "Checking Python environment"
+    echo "=================================="
+
+    if [ ! -d "$PYTHON_DIR" ] || [ ! -f "$REQUIREMENTS_FILE" ]; then
+        echo "No python folder or requirements.txt found at $PYTHON_DIR — skipping."
+        return 0
+    fi
+
+    if [ ! -d "$VENV_DIR" ]; then
+        echo "Creating virtual environment at $VENV_DIR"
+        python3 -m venv "$VENV_DIR"
+    fi
+
+    NEW_PY_HASH=$(md5sum "$REQUIREMENTS_FILE" | awk '{print $1}')
+    PY_HASH_FILE="$PYTHON_DIR/.requirements.hash"
+
+    if [ -f "$PY_HASH_FILE" ]; then
+        OLD_PY_HASH=$(cat "$PY_HASH_FILE")
+    else
+        OLD_PY_HASH=""
+    fi
+
+    if [ "$NEW_PY_HASH" != "$OLD_PY_HASH" ]; then
+        echo "requirements.txt changed. Installing python dependencies..."
+        "$VENV_DIR/bin/pip" install --upgrade pip
+        "$VENV_DIR/bin/pip" install -r "$REQUIREMENTS_FILE"
+        echo "$NEW_PY_HASH" > "$PY_HASH_FILE"
+    else
+        echo "No changes in requirements.txt. Skipping pip install."
+    fi
+
+    echo "Installed python packages:"
+    "$VENV_DIR/bin/pip" list
+}
+
 # ===================================================================
 # 2. DEPLOYMENT EXECUTION
 # ===================================================================
@@ -83,7 +124,10 @@ echo "Current directory:"
 pwd
 echo "=================================="
 
+setup_python_env
+
 echo "Checking for package changes..."
+
 
 # Generate hash of current package-lock.json
 NEW_HASH=$(md5sum package-lock.json | awk '{print $1}')
