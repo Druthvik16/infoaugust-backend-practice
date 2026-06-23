@@ -22,34 +22,6 @@ app.get('/health', (req, res) => {
     console.log("health api called")
 });
 
-app.get('/api/test/new', (req, res) => {
-    return res.status(200).json({
-        status_code: 200,
-        message: "Dummy GET API working",
-        status_name: getCode.getStatus(200),
-        data: {
-            id: 1,
-            name: "Test User",
-            environment: "Development"
-        }
-    });
-    console.log("test api called")
-});
-
-app.get('/api/dummy', (req, res) => {
-    return res.status(200).json({
-        status_code: 200,
-        message: "Dummy GET API working",
-        status_name: getCode.getStatus(200),
-        data: {
-            id: 1,
-            name: "Test User",
-            environment: "Development"
-        }
-    });
-});
-
-
 
 //For Logo 
 app.use('/api/logo', (req,res,next) =>
