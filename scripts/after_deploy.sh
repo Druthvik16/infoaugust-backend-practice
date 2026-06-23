@@ -16,37 +16,63 @@ PM2_NAME="infoAugustServer"
 # Change port if required
 HEALTH_URL="http://localhost:3001/health"
 SNS_TOPIC_ARN="arn:aws:sns:ap-south-1:123456789012:backend-deployment-notifications"
+S3_BUCKET="deployment-log-storage"
+REGION="ap-south-1"
 
-send_failure_notification() {
+TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 
-    echo "Collecting PM2 logs..."
+finalize() {
+    STATUS="$1"   # SUCCESS or FAILURE
 
-    LOG_FILE="/tmp/${PM2_NAME}-failure.log"
+    LOG_FILE="/tmp/${PM2_NAME}-${STATUS}-${TIMESTAMP}.log"
+    S3_KEY="logs/${PM2_NAME}-${STATUS}-${TIMESTAMP}.log"
 
     {
         echo "================================="
-        echo "Deployment Failed"
+        echo "Deployment Status: $STATUS"
         echo "Server: $(hostname)"
         echo "Time: $(date)"
         echo "Application: $PM2_NAME"
         echo "================================="
         echo ""
-        echo "========= LAST 50 PM2 LOGS ========="
-
-        pm2 logs "$PM2_NAME" --lines 50 --nostream || true
-
-        echo ""
         echo "========= PM2 STATUS ========="
-
         pm2 describe "$PM2_NAME" || true
-
+        echo ""
+        echo "========= LAST 100 PM2 LOGS ========="
+        pm2 logs "$PM2_NAME" --lines 100 --nostream || true
     } > "$LOG_FILE" 2>&1
+
+    echo ""
+    echo "===== LOG FILE CONTENT ====="
+    cat "$LOG_FILE"
+    echo "============================"
+
+    # Upload log to S3
+    aws s3 cp "$LOG_FILE" "s3://${S3_BUCKET}/${S3_KEY}" --region "$REGION" || true
+
+    # Generate a presigned URL valid for 7 days (max allowed: 604800 seconds)
+    PRESIGNED_URL=$(aws s3 presign "s3://${S3_BUCKET}/${S3_KEY}" --expires-in 604800 --region "$REGION" || echo "Could not generate link")
+
+    # Compose mail message
+    MESSAGE="Deployment ${STATUS}
+
+Application: ${PM2_NAME}
+Server: $(hostname)
+Time: $(date)
+
+Log file: ${PM2_NAME}-${STATUS}-${TIMESTAMP}.log
+
+Click below to view/download the log (link valid for 7 days):
+${PRESIGNED_URL}
+"
 
     aws sns publish \
         --topic-arn "$SNS_TOPIC_ARN" \
-        --subject "Deployment Failed - $PM2_NAME" \
-        --message file://"$LOG_FILE" || true
+        --subject "Deployment ${STATUS} - ${PM2_NAME}" \
+        --message "$MESSAGE" \
+        --region "$REGION" || true
 }
+
 
 # ===================================================================
 # 2. DEPLOYMENT EXECUTION
@@ -126,7 +152,7 @@ else
     echo "PM2 Process Failed"
     echo "=================================="
 
-    send_failure_notification
+    finalize "FAILURE"
 
     exit 1
 
@@ -146,7 +172,7 @@ else
     echo "Health Check Failed"
     echo "=================================="
 
-    send_failure_notification
+    finalize "FAILURE"
 
     exit 1
 
@@ -157,6 +183,8 @@ echo "Recent PM2 Logs"
 echo "=================================="
 
 pm2 logs "$PM2_NAME" --lines 30 --nostream || true
+
+finalize "SUCCESS"
 
 echo "=================================="
 echo "Deployment of $PM2_NAME completed successfully"
