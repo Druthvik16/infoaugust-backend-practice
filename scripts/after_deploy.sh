@@ -17,9 +17,9 @@ SNS_TOPIC_ARN="arn:aws:sns:ap-south-1:909317186074:backend-deployment-notificati
 S3_BUCKET="deployment-log-storage"
 REGION="ap-south-1"
 
-PYTHON_DIR="$APP_DIR/scripts/python"
+PYTHON_DIR="$APP_DIR/scripts"
 VENV_DIR="$PYTHON_DIR/venv"
-REQUIREMENTS_FILE="$PYTHON_DIR/requirements.txt"
+REQUIREMENTS_FILE="$PYTHON_DIR/requirement.txt"
 
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 
