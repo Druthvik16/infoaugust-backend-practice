@@ -15,6 +15,39 @@ PM2_NAME="infoAugustServer"
 
 # Change port if required
 HEALTH_URL="http://localhost:3001/health"
+LOG_FILE="/tmp/deployment-error.log"
+SNS_TOPIC_ARN="arn:aws:sns:ap-south-1:123456789012:backend-deployment-notifications"
+
+send_failure_notification() {
+
+    echo "Collecting PM2 logs..."
+
+    LOG_FILE="/tmp/${PM2_NAME}-failure.log"
+
+    {
+        echo "================================="
+        echo "Deployment Failed"
+        echo "Server: $(hostname)"
+        echo "Time: $(date)"
+        echo "Application: $PM2_NAME"
+        echo "================================="
+        echo ""
+        echo "========= LAST 50 PM2 LOGS ========="
+
+        pm2 logs "$PM2_NAME" --lines 50 --nostream || true
+
+        echo ""
+        echo "========= PM2 STATUS ========="
+
+        pm2 describe "$PM2_NAME" || true
+
+    } > "$LOG_FILE" 2>&1
+
+    aws sns publish \
+        --topic-arn "$SNS_TOPIC_ARN" \
+        --subject "Deployment Failed - $PM2_NAME" \
+        --message file://"$LOG_FILE" || true
+}
 
 # ===================================================================
 # 2. DEPLOYMENT EXECUTION
@@ -94,10 +127,7 @@ else
     echo "PM2 Process Failed"
     echo "=================================="
 
-    echo ""
-    echo "========= LAST 50 PM2 LOGS ========="
-    pm2 logs "$PM2_NAME" --lines 50 --nostream || true
-    echo "===================================="
+    send_failure_notification
 
     exit 1
 
@@ -117,10 +147,7 @@ else
     echo "Health Check Failed"
     echo "=================================="
 
-    echo ""
-    echo "========= LAST 50 PM2 LOGS ========="
-    pm2 logs "$PM2_NAME" --lines 50 --nostream || true
-    echo "===================================="
+    send_failure_notification
 
     exit 1
 
