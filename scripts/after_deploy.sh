@@ -12,6 +12,7 @@ set -x
 
 APP_DIR="/home/ubuntu/node-application-docbase/info-august-dev"
 PM2_NAME="infoAugustServer"
+HEALTH_URL="http://localhost:3000/health"
 
 # ===================================================================
 # 2. DEPLOYMENT EXECUTION
@@ -70,3 +71,65 @@ sudo pm2 restart "$PM2_NAME"
 echo "=================================="
 echo "Deployment of $PM2_NAME completed successfully"
 echo "=================================="
+
+sleep 15
+
+echo "=================================="
+echo "Checking PM2 Status"
+echo "=================================="
+
+PM2_STATUS=$(pm2 describe "$PM2_NAME" | grep "status" | head -1)
+
+echo "$PM2_STATUS"
+
+if echo "$PM2_STATUS" | grep -qi "online"; then
+   
+    echo "PM2 Process is ONLINE"
+
+else
+
+    echo "=================================="
+    echo "PM2 Process Failed"
+    echo "=================================="
+
+    echo ""
+    echo "========= LAST 50 PM2 LOGS ========="
+    pm2 logs "$PM2_NAME" --lines 50 --nostream || true
+    echo "===================================="
+
+    exit 1
+
+fi
+
+    echo "=================================="
+    echo "Running Health Check"
+    echo "=================================="
+
+if curl -f -s "$HEALTH_URL" > /dev/null; then
+
+     echo "Health Check Passed"
+    
+else
+
+    echo "=================================="
+    echo "Health Check Failed"
+    echo "=================================="
+
+    echo ""
+    echo "========= LAST 50 PM2 LOGS ========="
+    pm2 logs "$PM2_NAME" --lines 50 --nostream || true
+    echo "===================================="
+
+    exit 1
+
+fi
+
+    echo "=================================="
+    echo "Recent PM2 Logs"
+    echo "=================================="
+
+    pm2 logs "$PM2_NAME" --lines 30 --nostream || true
+
+    echo "=================================="
+    echo "Deployment of $PM2_NAME completed successfully"
+    echo "=================================="
