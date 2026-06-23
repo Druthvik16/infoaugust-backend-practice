@@ -7,7 +7,7 @@ uploadedDocRoute.use('/saveClientUploadedSummaryDocs',require('./saveClientUploa
 uploadedDocRoute.use('/saveMonthlyTransactionDocs',require('./saveMonthlyTransactionDocs.js'))
 uploadedDocRoute.use('/saveInvoicePTDocs',require('./saveInvoicePTDocs.js'))
 uploadedDocRoute.use('/saveCnsAndInvSummaryData',require('./saveCnsAndInvSummaryData.js'))
-uploadedDocRoute.use('/processLedgerSummary',require('./processLedgerSummary.js'))
+// uploadedDocRoute.use('/processLedgerSummary',require('./processLedgerSummary.js'))
 uploadedDocRoute.use('/processMonthlyTransaction',require('./processMonthlyTransaction.js'))
 uploadedDocRoute.use('/processWorkingFile',require('./processWorkingFile.js'))
 uploadedDocRoute.use('/processCreditNoteSummary',require('./processCreditNoteSummary.js'))

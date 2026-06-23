@@ -14,6 +14,42 @@ dotenv.config();
 let logoId = ''
   const { getDiskSpaceStatus } = require('./diskSpaceChecker/diskSpaceChecker.js');
 
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'UP',
+        timestamp: new Date().toISOString()
+    });
+    console.log("health api called")
+});
+
+app.get('/api/test', (req, res) => {
+    return res.status(200).json({
+        status_code: 200,
+        message: "Dummy GET API working",
+        status_name: getCode.getStatus(200),
+        data: {
+            id: 1,
+            name: "Test User",
+            environment: "Development"
+        }
+    });
+    console.log("test api called")
+});
+
+app.get('/api/dummy', (req, res) => {
+    return res.status(200).json({
+        status_code: 200,
+        message: "Dummy GET API working",
+        status_name: getCode.getStatus(200),
+        data: {
+            id: 1,
+            name: "Test User",
+            environment: "Development"
+        }
+    });
+});
+
+
 
 //For Logo 
 app.use('/api/logo', (req,res,next) =>
@@ -69,58 +105,6 @@ app.use('/api/',(req,res,next) =>
     }) 
 })
 
-// Dummy GET API
-app.get('/api/test', (req, res) => {
-    return res.status(200).json({
-        status_code: 200,
-        message: "Dummy GET API working",
-        status_name: getCode.getStatus(200),
-        data: {
-            id: 1,
-            name: "Test User",
-            environment: "Development"
-        }
-    });
-});
-
-// Dummy POST API
-app.post('/api/test', (req, res) => {
-    return res.status(201).json({
-        status_code: 201,
-        message: "Dummy POST API working",
-        status_name: getCode.getStatus(201),
-        body: req.body
-    });
-});
-
-// Dummy Delay API (for loader testing)
-app.get('/api/test-delay', async (req, res) => {
-    setTimeout(() => {
-        res.status(200).json({
-            status_code: 200,
-            message: "Response after 5 seconds"
-        });
-    }, 5000);
-});
-
-// Dummy Error API
-app.get('/api/test-error', (req, res) => {
-    return res.status(500).json({
-        status_code: 500,
-        message: "Dummy server error",
-        status_name: getCode.getStatus(500)
-    });
-});
-
-// Keep this LAST
-app.use('/api/', (req, res, next) => {
-    return res.status(400).json({
-        status_code: 400,
-        message: "Something went wrong",
-        status_name: getCode.getStatus(400),
-        error: "Wrong method or api"
-    });
-});
 
 app.listen(port, () => 
 {
