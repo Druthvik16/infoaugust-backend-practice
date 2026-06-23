@@ -22,14 +22,6 @@ app.get('/health', (req, res) => {
     console.log("health api called")
 });
 
-app.get('/test-runtime-dependency', (req, res) => {
-
-    const lodash = require('lodash');
-
-    res.send('success');
-
-});
-
 //For Logo 
 app.use('/api/logo', (req,res,next) =>
 {

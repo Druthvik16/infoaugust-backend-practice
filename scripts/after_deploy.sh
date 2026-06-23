@@ -15,7 +15,7 @@ PM2_NAME="infoAugustServer"
 
 # Change port if required
 HEALTH_URL="http://localhost:3001/health"
-SNS_TOPIC_ARN="arn:aws:sns:ap-south-1:123456789012:backend-deployment-notifications"
+SNS_TOPIC_ARN="arn:aws:sns:ap-south-1:909317186074:backend-deployment-notifications"
 S3_BUCKET="deployment-log-storage"
 REGION="ap-south-1"
 
