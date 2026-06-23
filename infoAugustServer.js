@@ -5,7 +5,7 @@ let dotenv = require('dotenv');
 let errorCodes = require('./common/error/errorCode.js');
 let getCode = new errorCodes()
 let port = "3001";
-let app = express();
+let app = express(
 let path = require('path');
 app.use(cors());
 app.use(bodyParser.json({limit: '100mb'}));

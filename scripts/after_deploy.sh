@@ -39,7 +39,7 @@ finalize() {
         pm2 describe "$PM2_NAME" || true
         echo ""
         echo "========= LAST 100 PM2 LOGS ========="
-        pm2 logs "$PM2_NAME" --lines 100 --nostream || true
+        pm2 logs "$PM2_NAME" --lines 50 --nostream || true
     } > "$LOG_FILE" 2>&1
 
     echo ""
