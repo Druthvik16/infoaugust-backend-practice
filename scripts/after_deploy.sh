@@ -14,7 +14,7 @@ APP_DIR="/home/ubuntu/node-application-docbase/info-august-dev"
 PM2_NAME="infoAugustServer"
 
 # Change port if required
-HEALTH_URL="http://localhost:3000/health"
+HEALTH_URL="http://localhost:3001/health"
 
 # ===================================================================
 # 2. DEPLOYMENT EXECUTION
