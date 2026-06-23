@@ -81,4 +81,5 @@ app.use('/api/',(req,res,next) =>
 app.listen(port, () => 
 {
     console.log(`InfoAugust Server is running on port ${port}`)
+    console.log(".....InfoAugust....Started......")
 });
