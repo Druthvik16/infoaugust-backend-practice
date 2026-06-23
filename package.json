@@ -1,13 +1,14 @@
 {
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.515.0",
     "alasql": "^4.5.2",
     "archiver": "^7.0.1",
-    "@aws-sdk/client-s3": "^3.515.0",
     "aws-sdk": "^2.1546.0",
     "axios": "^1.6.5",
     "base64url": "^3.0.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
+    "cowsay": "^1.6.0",
     "date-fns": "^3.6.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
